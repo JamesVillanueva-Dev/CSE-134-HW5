@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="images/headshot.jpg" type="image/jpeg">
   <script src="theme.js"></script>
+  <script src="fact-panel.js" defer></script>
 </head>
 <body class="block-cards">
   <header>
@@ -31,6 +32,14 @@
   <main>
     <h1>Projects</h1>
     <p>A few things I've built. Each card gives a short summary and the tools I used.</p>
+
+    <!-- Fact panel (Homework 5). fact-panel.js builds everything inside
+         <fact-panel> and reveals the hidden button, so with JavaScript
+         off this section shows nothing and the page reads as before. -->
+    <section>
+      <button type="button" id="compact-toggle" aria-pressed="false" hidden>Compact view</button>
+      <fact-panel></fact-panel>
+    </section>
 
     <project-card>
       <h2>WatchTower</h2>

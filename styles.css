@@ -330,6 +330,91 @@ article {
   margin-block: 1rem;
 }
 
+/* Fact panel (projects.html + fact-panel.js). Built without Shadow DOM,
+   so these normal rules reach the elements the script creates. */
+
+/* :defined only matches once fact-panel.js has registered the tag with
+   customElements.define(). With JavaScript off the element stays empty,
+   so it gets no border or padding and no empty box appears. Custom tags
+   are display: inline by default, so this also makes it a block. */
+fact-panel:defined {
+  display: block;
+  margin-block: 1rem;
+  padding: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+  overflow-wrap: anywhere; /* long words or URLs (Part 2) wrap at 320px */
+}
+
+/* The global h2 rule adds space on top; inside the box the padding is
+   enough. */
+fact-panel h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+fact-panel .fact-text {
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+/* No display value here, so the hidden property that compact view sets
+   in fact-panel.js still hides this line. */
+fact-panel .fact-source {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+/* The space above "Next fact" lives on the button, not on the source
+   line, so it stays the same when compact view hides the source. */
+fact-panel button {
+  margin-top: 0.75rem;
+}
+
+/* Status line ("Fact 1 of 3"). It's the last child, so no bottom margin
+   inside the box. */
+fact-panel [role="status"] {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}
+
+/* Both buttons: 1px border in the text color, 2px corners. No display
+   value on #compact-toggle, so its hidden attribute keeps working. */
+#compact-toggle,
+fact-panel button {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+/* Hover underlines the text but keeps the colors, so it doesn't look
+   like the pressed state below. */
+#compact-toggle:hover,
+fact-panel button:hover {
+  text-decoration: underline;
+}
+
+/* aria-pressed="true" (compact view on) fills the button in, so the
+   state shows by shape, not just color. Same idea as #theme-toggle. */
+#compact-toggle[aria-pressed="true"] {
+  color: var(--color-surface);
+  background-color: var(--color-text);
+}
+
+/* Focus ring. --color-focus is at least 3:1 against both --color-bg and
+   --color-surface in both themes. The 2px offset leaves a gap so the
+   ring stays visible next to the button's border and the filled state. */
+#compact-toggle:focus,
+fact-panel button:focus {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
 /* About page (about.html). Wider main so the story text column next to
    the photo still gets ~70 characters per line. */
 .about-page main {
