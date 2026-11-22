@@ -399,6 +399,21 @@ fact-panel button:hover {
   text-decoration: underline;
 }
 
+/* While a fact is loading, fact-panel.js sets aria-disabled="true" on
+   the button. It looks unavailable two ways: dimmer text and a dashed
+   border, so it doesn't rely on color alone. No opacity, because that
+   would fade the focus ring too. color-mix() blends 65% text color with
+   35% surface color; that still has at least 4.5:1 contrast in both
+   themes. Same specificity as the hover rule above, but later, so it
+   wins and hovering doesn't underline. cursor: progress shows a busy
+   pointer. */
+fact-panel button[aria-disabled="true"] {
+  color: color-mix(in srgb, var(--color-text) 65%, var(--color-surface));
+  border-style: dashed;
+  cursor: progress;
+  text-decoration: none;
+}
+
 /* aria-pressed="true" (compact view on) fills the button in, so the
    state shows by shape, not just color. Same idea as #theme-toggle. */
 #compact-toggle[aria-pressed="true"] {
