@@ -333,6 +333,29 @@ article {
 /* Fact panel (projects.html + fact-panel.js). Built without Shadow DOM,
    so these normal rules reach the elements the script creates. */
 
+/* Page side: the portfolio sets the panel's three custom properties.
+   The component rules below only read these --fact-panel-* names, never
+   the site's --color-* names, so this rule is the one place that
+   connects the panel to the site's colors.
+   The dark theme works automatically: these three point at --color-surface
+   and --color-text, and the site already redefines those two under
+   :root[data-theme="dark"]. When theme.js switches the theme, the
+   browser recalculates var() and the panel's colors switch too.
+   Custom properties are inherited, so every element inside <fact-panel>
+   can read them, but elements outside it (like #compact-toggle) can't. */
+fact-panel {
+  --fact-panel-background: var(--color-surface);
+  --fact-panel-text: var(--color-text);
+  --fact-panel-border: var(--color-text);
+}
+
+/* Component side: from here on, every color for the panel and the
+   elements inside it comes from a --fact-panel-* property. The second
+   value in var(name, fallback) is used if that property isn't set, for
+   example if the panel were used on a page without the rule above.
+   The fallbacks (#1f2328 text and border on #ffffff) are the light
+   theme's colors, so the panel is still readable. */
+
 /* :defined only matches once fact-panel.js has registered the tag with
    customElements.define(). With JavaScript off the element stays empty,
    so it gets no border or padding and no empty box appears. Custom tags
@@ -341,9 +364,9 @@ fact-panel:defined {
   display: block;
   margin-block: 1rem;
   padding: 1rem;
-  color: var(--color-text);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-text);
+  color: var(--fact-panel-text, #1f2328);
+  background-color: var(--fact-panel-background, #ffffff);
+  border: 1px solid var(--fact-panel-border, #1f2328);
   border-radius: 2px;
   overflow-wrap: anywhere; /* long words or URLs (Part 2) wrap at 320px */
 }
@@ -367,23 +390,35 @@ fact-panel .fact-source {
   margin-bottom: 0;
 }
 
-/* The space above "Next fact" lives on the button, not on the source
-   line, so it stays the same when compact view hides the source. */
-fact-panel button {
-  margin-top: 0.75rem;
-}
-
-/* Status line ("Fact 1 of 3"). It's the last child, so no bottom margin
-   inside the box. */
+/* Status line ("Loading a new fact…" and so on). It's the last child,
+   so no bottom margin inside the box. */
 fact-panel [role="status"] {
   margin: 0.5rem 0 0;
   font-size: 0.875rem;
 }
 
-/* Both buttons: 1px border in the text color, 2px corners. No display
-   value on #compact-toggle, so its hidden attribute keeps working. */
-#compact-toggle,
+/* The two buttons look the same (1px border, 2px corners) but have
+   separate rules, because they get their colors from different places. */
+
+/* "Get a new fact" is INSIDE <fact-panel>, so it reads the panel's
+   custom properties. The space above it lives on the button, not on
+   the source line, so it stays the same when compact view hides the
+   source. */
 fact-panel button {
+  margin-top: 0.75rem;
+  color: var(--fact-panel-text, #1f2328);
+  background-color: var(--fact-panel-background, #ffffff);
+  border: 1px solid var(--fact-panel-border, #1f2328);
+  border-radius: 2px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+/* "Compact view" is OUTSIDE <fact-panel> (it's the panel's sibling in
+   projects.html), so the --fact-panel-* properties don't reach it. It
+   uses the site's variables directly instead. No display value, so its
+   hidden attribute keeps working. */
+#compact-toggle {
   color: var(--color-text);
   background-color: var(--color-surface);
   border: 1px solid var(--color-text);
@@ -402,13 +437,18 @@ fact-panel button:hover {
 /* While a fact is loading, fact-panel.js sets aria-disabled="true" on
    the button. It looks unavailable two ways: dimmer text and a dashed
    border, so it doesn't rely on color alone. No opacity, because that
-   would fade the focus ring too. color-mix() blends 65% text color with
-   35% surface color; that still has at least 4.5:1 contrast in both
-   themes. Same specificity as the hover rule above, but later, so it
-   wins and hovering doesn't underline. cursor: progress shows a busy
-   pointer. */
+   would fade the focus ring too. color-mix() blends 65% of the panel's
+   text color with 35% of its background color; that still has at least
+   4.5:1 contrast in both themes. Each var() has the same fallback as
+   above, so the mix still works if the properties aren't set. Same
+   specificity as the hover rule above, but later, so it wins and
+   hovering doesn't underline. cursor: progress shows a busy pointer. */
 fact-panel button[aria-disabled="true"] {
-  color: color-mix(in srgb, var(--color-text) 65%, var(--color-surface));
+  color: color-mix(
+    in srgb,
+    var(--fact-panel-text, #1f2328) 65%,
+    var(--fact-panel-background, #ffffff)
+  );
   border-style: dashed;
   cursor: progress;
   text-decoration: none;
@@ -421,13 +461,31 @@ fact-panel button[aria-disabled="true"] {
   background-color: var(--color-text);
 }
 
-/* Focus ring. --color-focus is at least 3:1 against both --color-bg and
-   --color-surface in both themes. The 2px offset leaves a gap so the
-   ring stays visible next to the button's border and the filled state. */
+/* Focus ring for both buttons. It uses the site's --color-focus (not a
+   panel property), because the ring is drawn outside the button, over
+   the page as well as the panel. --color-focus is at least 3:1 against
+   both --color-bg and --color-surface in both themes. The 2px offset
+   leaves a gap so the ring stays visible next to the button's border
+   and the filled state. */
 #compact-toggle:focus,
 fact-panel button:focus {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+/* No-JavaScript fallback (projects.html). The <noscript> sits right
+   after <fact-panel>, so the + (next sibling) combinator finds it. Its
+   content only shows when JavaScript is off, so this rule never applies
+   otherwise. It's boxed like the panel so the message sits where the
+   widget would be. Site variables, not --fact-panel-* ones, because the
+   message is outside <fact-panel>. */
+fact-panel + noscript p {
+  margin-block: 1rem;
+  padding: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
 }
 
 /* About page (about.html). Wider main so the story text column next to

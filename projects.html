@@ -34,11 +34,14 @@
     <p>A few things I've built. Each card gives a short summary and the tools I used.</p>
 
     <!-- Fact panel (Homework 5). fact-panel.js builds everything inside
-         <fact-panel> and reveals the hidden button, so with JavaScript
-         off this section shows nothing and the page reads as before. -->
+         <fact-panel> and reveals the hidden button. With JavaScript off,
+         the button stays hidden, the panel stays empty, and the
+         <noscript> message shows instead. -->
     <section>
       <button type="button" id="compact-toggle" aria-pressed="false" hidden>Compact view</button>
       <fact-panel></fact-panel>
+      <!-- <noscript> content is only shown when JavaScript is off. -->
+      <noscript><p>Enable JavaScript to load live data for this widget.</p></noscript>
     </section>
 
     <project-card>

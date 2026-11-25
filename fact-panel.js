@@ -1,4 +1,4 @@
-// fact-panel.js: the <fact-panel> Web Component (Homework 5, Parts 1-2).
+// fact-panel.js: the <fact-panel> Web Component (Homework 5, Parts 1-3).
 //
 // Loaded on projects.html with <script src="fact-panel.js" defer>.
 // "defer" downloads the file while the HTML is parsed, then runs it
@@ -11,7 +11,11 @@
 // Useless Facts API with fetch(), without reloading the page.
 //
 // No Shadow DOM: the component puts its elements straight into the page,
-// so the normal rules in styles.css style them.
+// so the normal rules in styles.css style them. Their colors come from
+// the --fact-panel-* custom properties set in styles.css.
+//
+// The "Compact view" button (section 3) remembers its setting with
+// localStorage, so compact view stays on after a reload.
 
 // ---------------------------------------------------------------------
 // 1. Settings and sample data
@@ -19,6 +23,12 @@
 
 // The API address. "?language=en" asks for an English fact.
 const API_URL = "https://uselessfacts.jsph.pl/api/v2/facts/random?language=en";
+
+// The localStorage key the compact view preference is saved under (see
+// section 3). The saved value is always "compact" or "expanded". The
+// name is different from theme.js's "portfolio-theme", so the two
+// settings never overwrite each other.
+const MODE_KEY = "hw5-fact-panel-mode";
 
 // An array of objects shaped like the API's response: { text, source }.
 // const means this variable can't be reassigned to a different array.
@@ -259,7 +269,8 @@ class FactPanel extends HTMLElement {
 customElements.define("fact-panel", FactPanel);
 
 // ---------------------------------------------------------------------
-// 3. The "Compact view" button (outside the component)
+// 3. The "Compact view" button (outside the component), saved with
+//    localStorage
 // ---------------------------------------------------------------------
 
 const compactToggle = document.getElementById("compact-toggle");
@@ -272,11 +283,44 @@ if (compactToggle && factPanel) {
   // JavaScript is running, so reveal it.
   compactToggle.hidden = false;
 
-  // Start aria-pressed in sync with the panel ("true" = compact is on).
+  // --- Restore the saved preference on page load ---
+
+  // Start with the default. "let" (not const) because the saved value
+  // may replace it below.
+  let mode = "expanded";
+
+  // localStorage can throw (for example when storage is blocked or in
+  // some private modes), so reading it is wrapped in try/catch, like in
+  // theme.js.
+  try {
+    // getItem() returns the saved string, or null if nothing was saved.
+    const savedMode = localStorage.getItem(MODE_KEY);
+
+    // Only accept the two values we know. null (nothing saved) or junk
+    // like "banana" fails this check, so mode stays "expanded".
+    if (savedMode === "compact" || savedMode === "expanded") {
+      mode = savedMode;
+    }
+  } catch (error) {
+    // Reading failed: keep the default, so the panel starts expanded.
+  }
+
+  // Apply the mode the same way the button does: by setting or removing
+  // the observed "compact" attribute. The second argument "forces" the
+  // result: true always adds the attribute, false always removes it.
+  // Either change runs the panel's attributeChangedCallback, which shows
+  // or hides the source line.
+  factPanel.toggleAttribute("compact", mode === "compact");
+
+  // Now that the panel is in its starting state, make aria-pressed match
+  // it ("true" = compact is on). String() turns true/false into
+  // "true"/"false".
   compactToggle.setAttribute(
     "aria-pressed",
     String(factPanel.hasAttribute("compact"))
   );
+
+  // --- Change and save the preference when the button is used ---
 
   compactToggle.addEventListener("click", () => {
     // toggleAttribute("compact") adds the attribute if it's missing and
@@ -286,7 +330,19 @@ if (compactToggle && factPanel) {
     const isCompact = factPanel.toggleAttribute("compact");
 
     // aria-pressed tells screen readers whether the toggle is on.
-    // String() turns true/false into "true"/"false".
     compactToggle.setAttribute("aria-pressed", String(isCompact));
+
+    // Apply first (above), save second (here). Saving has its own
+    // try/catch: if storage is blocked, the panel has already changed on
+    // this page; the choice just won't be remembered after a reload.
+    // The ternary (condition ? a : b) turns true/false into the saved
+    // words "compact"/"expanded".
+    try {
+      localStorage.setItem(MODE_KEY, isCompact ? "compact" : "expanded");
+    } catch (error) {
+      // console.warn (not error): the page still works, so it's only a
+      // warning for the developer, visible in the console.
+      console.warn("Couldn't save the compact view preference:", error);
+    }
   });
 }
