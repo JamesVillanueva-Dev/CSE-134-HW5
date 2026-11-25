@@ -1,0 +1,4 @@
+# Installed packages: recreate them with `npm install`.
+node_modules/
+# Build output: recreate it with `npm run build`.
+_site/

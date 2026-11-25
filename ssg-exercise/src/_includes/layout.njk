@@ -1,0 +1,57 @@
+{#- layout.njk: the shared page shell for Home and About.
+
+    Each page names this file in its front matter ("layout: layout.njk").
+    Eleventy builds the page's own content first, then puts it into this
+    file where {{ content }} is.
+
+    Values in double curly braces come from the page's front matter:
+    title, description and bodyClass. "page" is a variable Eleventy adds
+    to every page; page.url is the page's address ("/" for Home,
+    "/about.html" for About).
+
+    This is a Nunjucks comment: it isn't copied into the HTML. The dash
+    at its start and end also removes the whitespace next to it, so the
+    built file starts right at the doctype. -#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ description }}">
+  <meta name="author" content="James Villanueva">
+  <title>{{ title }}</title>
+  {#- Relative paths: both pages are in the top level of _site, next to
+      styles.css and the images folder. #}
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="images/headshot.jpg" type="image/jpeg">
+</head>
+{#- The two pages use different classes from styles.css: "block-cards"
+    on Home and "about-page" on About. #}
+<body class="{{ bodyClass }}">
+  <header>
+    <p><a href="index.html">James Villanueva</a></p>
+    {#- Only the two pages in this exercise. The portfolio's other nav
+        links are left out because those pages aren't in _site, so the
+        links would be broken. No theme toggle: this exercise has no
+        JavaScript.
+        aria-current="page" marks the link to the page you're on. The
+        if tag adds it only on the matching page. #}
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="index.html"{% if page.url == "/" %} aria-current="page"{% endif %}>Home</a></li>
+        <li><a href="about.html"{% if page.url == "/about.html" %} aria-current="page"{% endif %}>About</a></li>
+      </ul>
+    </nav>
+  </header>
+  {#- The page's own content goes inside <main>. "| safe" tells Nunjucks
+      the content is HTML we wrote ourselves, so it's inserted as HTML
+      instead of being escaped into visible text like "&lt;h1&gt;". #}
+
+  <main>
+{{ content | safe }}
+  </main>
+  {#- The shared footer, from _includes/footer.njk. Change the footer in
+      that one file, rebuild, and both pages update. #}
+  {% include "footer.njk" %}
+</body>
+</html>

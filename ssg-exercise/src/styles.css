@@ -1,0 +1,762 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+
+/* Light theme (the default). Every color on the site comes from these
+   variables, so the dark theme below only has to redefine them. */
+:root {
+  color-scheme: light; /* native controls (scrollbars, progress) match */
+  --color-text: #1f2328;
+  --color-bg: #cedaf9;
+  --color-surface: #ffffff; /* cards, articles, form fields */
+  --color-accent: #ffffff; /* line under the header */
+  --font-main: "Helvetica Neue", Arial, sans-serif;
+  --max-width: calc(70ch + 2 * var(--space)); /* ~70 characters per line plus main's padding */
+  --space: 1.5rem;
+  --color-link: #1d4ed8;
+  --color-link-hover: #9a3412;
+  /* Focus ring for the page body: at least 3:1 against --color-bg and
+     --color-surface. The header has its own, see below. */
+  --color-focus: #b45309;
+  --color-header-bg: #1f2328;
+  --color-header-text: #ffffff;
+  --color-header-hover: #ffa600;
+  --color-header-focus: #ffa600; /* 3:1+ against --color-header-bg */
+  --color-chip-bg: #e8efff;
+  --color-error: #b42318;
+  --color-error-bg: #fff5f5;
+  --color-valid: #1a7f37;
+  --color-warning: #7a4100;
+}
+
+/* Dark theme, turned on by theme.js setting data-theme="dark" on <html>.
+   All pairs meet WCAG AA (4.5:1 text, 3:1 focus rings and borders). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-text: #e6edf3;
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-accent: #6e7681;
+  --color-link: #79b8ff;
+  --color-link-hover: #ffa657;
+  --color-focus: #ffa600;
+  --color-header-bg: #21262d;
+  --color-header-text: #f0f6fc;
+  --color-header-hover: #ffb84d;
+  --color-header-focus: #ffa600;
+  --color-chip-bg: #1f2d4d;
+  --color-error: #ff7b72;
+  --color-error-bg: #2d1214;
+  --color-valid: #3fb950;
+  --color-warning: #e3b341;
+}
+
+/* Cross-fade between pages when following a link. Only for people who
+   haven't asked for reduced motion; unsupported browsers ignore it. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+
+body > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.75rem var(--space);
+  background-color: var(--color-header-bg);
+  border-bottom: 3px solid var(--color-accent);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+/* Descendant combinator (space): matches any a inside header, at any depth.
+   Makes header links readable on the dark background. */
+body > header a {
+  color: var(--color-header-text);
+  text-decoration: none;
+}
+
+/* Header hover and focus use the header's own colors, because the
+   page-body colors don't have enough contrast on the header background. */
+body > header a:hover {
+  color: var(--color-header-hover);
+}
+
+body > header a:focus,
+body > header button:focus {
+  outline-color: var(--color-header-focus);
+}
+
+/* Theme toggle: outlined to match the header. aria-pressed="true" (dark
+   theme on) fills it in, so the state shows without relying on color. */
+#theme-toggle {
+  color: var(--color-header-text);
+  background-color: transparent;
+  border: 1px solid var(--color-header-text);
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  padding: 0.25rem 0.625rem;
+}
+
+/* Hover changes the border and underlines the text but not the text
+   color, so it stays readable in the pressed (filled) state too. */
+#theme-toggle:hover {
+  border-color: var(--color-header-hover);
+  text-decoration: underline;
+}
+
+#theme-toggle[aria-pressed="true"] {
+  color: var(--color-header-bg);
+  background-color: var(--color-header-text);
+}
+
+/* The nav is always the header's last item and is pushed right, so it sits in the same place whether or not the page has the theme button (form-no-js.html has none). */
+body > header nav { margin-left: auto; }
+
+/* Below this width the nav always gets its own line, so every page's header wraps at the same point. */
+@media (max-width: 85rem) {
+  body > header nav { flex-basis: 100%; margin-left: 0; }
+}
+
+/* Child combinator (>): matches a p only when it is a direct child of header.
+   Styles the site name. */
+body > header > p {
+  font-size: 1.25rem;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+}
+main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space);
+}
+
+
+nav > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+}
+
+nav a {
+  padding: 0.5em 1em;  /* em: scales with the link's font size */
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.6;
+  margin: 0;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: var(--space);
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.75rem;
+  margin-top: var(--space);
+  text-align: center;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+a {
+  color: var(--color-link);
+}
+
+/* Keep wide media (e.g. the 400px headshot, the 640px video) inside
+   narrow screens */
+img,
+video,
+audio,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+a:hover {
+    color: var(--color-link-hover);
+}
+
+a:focus, input:focus, button:focus, textarea:focus{
+    outline: 3px solid var(--color-focus);
+}
+
+  /* Attribute selector ([attr="value"]): matches the section whose aria-labelledby
+     equals "skills-heading". Places the two skill groups side by side. */
+section[aria-labelledby="skills-heading"] {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 3rem;
+}
+p,
+ul {
+  margin-bottom: 1rem;
+}
+#skills-heading {
+  width: 100%;
+}
+#intro-heading{
+    text-align: center;
+}
+#intro-heading + picture img {
+  display: block;
+  margin: 1rem auto;
+}
+
+body > header p,
+body > header ul {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  padding-left: 1.5rem;
+}
+
+footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+footer {
+  text-align: center;
+  padding: var(--space);
+  border-top: 1px solid var(--color-text);
+}
+
+@media (max-width: 600px) {
+  body > header {
+    position: static;
+    column-gap: 0.75rem;
+    padding-inline: 1rem;
+  }
+
+  #theme-toggle {
+    font-size: 0.8125rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
+project-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border-radius: 0.5rem;
+  padding: var(--space);
+}
+project-card a {
+  margin-top: auto;
+  font-weight: bold;
+}
+
+.project-progress {
+  display: grid;
+  gap: 0.5rem;
+  margin-block: 0.5rem 1rem;
+}
+
+.project-progress label {
+  width: fit-content;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background-color: var(--color-chip-bg);
+  color: var(--color-link);
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.project-progress progress {
+  width: 100%;
+  height: 0.75rem;
+  accent-color: var(--color-link);
+}
+
+fieldset {
+  padding: var(--space);
+}
+
+label {
+  display: block;
+}
+
+fieldset input,
+fieldset textarea {
+  width: 100%;
+  font: inherit;
+  margin-bottom: 1rem;
+}
+
+button {
+  font: inherit;
+  padding: 0.5em 1em;
+}
+
+article {
+  background-color: var(--color-surface);
+  padding: var(--space);
+  margin-bottom: 1rem;
+}
+
+.block-cards project-card {
+  display: block;
+  border: 1px solid;
+  padding: 1rem;
+  margin-block: 1rem;
+}
+
+/* Fact panel (projects.html + fact-panel.js). Built without Shadow DOM,
+   so these normal rules reach the elements the script creates. */
+
+/* Page side: the portfolio sets the panel's three custom properties.
+   The component rules below only read these --fact-panel-* names, never
+   the site's --color-* names, so this rule is the one place that
+   connects the panel to the site's colors.
+   The dark theme works automatically: these three point at --color-surface
+   and --color-text, and the site already redefines those two under
+   :root[data-theme="dark"]. When theme.js switches the theme, the
+   browser recalculates var() and the panel's colors switch too.
+   Custom properties are inherited, so every element inside <fact-panel>
+   can read them, but elements outside it (like #compact-toggle) can't. */
+fact-panel {
+  --fact-panel-background: var(--color-surface);
+  --fact-panel-text: var(--color-text);
+  --fact-panel-border: var(--color-text);
+}
+
+/* Component side: from here on, every color for the panel and the
+   elements inside it comes from a --fact-panel-* property. The second
+   value in var(name, fallback) is used if that property isn't set, for
+   example if the panel were used on a page without the rule above.
+   The fallbacks (#1f2328 text and border on #ffffff) are the light
+   theme's colors, so the panel is still readable. */
+
+/* :defined only matches once fact-panel.js has registered the tag with
+   customElements.define(). With JavaScript off the element stays empty,
+   so it gets no border or padding and no empty box appears. Custom tags
+   are display: inline by default, so this also makes it a block. */
+fact-panel:defined {
+  display: block;
+  margin-block: 1rem;
+  padding: 1rem;
+  color: var(--fact-panel-text, #1f2328);
+  background-color: var(--fact-panel-background, #ffffff);
+  border: 1px solid var(--fact-panel-border, #1f2328);
+  border-radius: 2px;
+  overflow-wrap: anywhere; /* long words or URLs (Part 2) wrap at 320px */
+}
+
+/* The global h2 rule adds space on top; inside the box the padding is
+   enough. */
+fact-panel h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+fact-panel .fact-text {
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+/* No display value here, so the hidden property that compact view sets
+   in fact-panel.js still hides this line. */
+fact-panel .fact-source {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+/* Status line ("Loading a new fact…" and so on). It's the last child,
+   so no bottom margin inside the box. */
+fact-panel [role="status"] {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}
+
+/* The two buttons look the same (1px border, 2px corners) but have
+   separate rules, because they get their colors from different places. */
+
+/* "Get a new fact" is INSIDE <fact-panel>, so it reads the panel's
+   custom properties. The space above it lives on the button, not on
+   the source line, so it stays the same when compact view hides the
+   source. */
+fact-panel button {
+  margin-top: 0.75rem;
+  color: var(--fact-panel-text, #1f2328);
+  background-color: var(--fact-panel-background, #ffffff);
+  border: 1px solid var(--fact-panel-border, #1f2328);
+  border-radius: 2px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+/* "Compact view" is OUTSIDE <fact-panel> (it's the panel's sibling in
+   projects.html), so the --fact-panel-* properties don't reach it. It
+   uses the site's variables directly instead. No display value, so its
+   hidden attribute keeps working. */
+#compact-toggle {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+/* Hover underlines the text but keeps the colors, so it doesn't look
+   like the pressed state below. */
+#compact-toggle:hover,
+fact-panel button:hover {
+  text-decoration: underline;
+}
+
+/* While a fact is loading, fact-panel.js sets aria-disabled="true" on
+   the button. It looks unavailable two ways: dimmer text and a dashed
+   border, so it doesn't rely on color alone. No opacity, because that
+   would fade the focus ring too. color-mix() blends 65% of the panel's
+   text color with 35% of its background color; that still has at least
+   4.5:1 contrast in both themes. Each var() has the same fallback as
+   above, so the mix still works if the properties aren't set. Same
+   specificity as the hover rule above, but later, so it wins and
+   hovering doesn't underline. cursor: progress shows a busy pointer. */
+fact-panel button[aria-disabled="true"] {
+  color: color-mix(
+    in srgb,
+    var(--fact-panel-text, #1f2328) 65%,
+    var(--fact-panel-background, #ffffff)
+  );
+  border-style: dashed;
+  cursor: progress;
+  text-decoration: none;
+}
+
+/* aria-pressed="true" (compact view on) fills the button in, so the
+   state shows by shape, not just color. Same idea as #theme-toggle. */
+#compact-toggle[aria-pressed="true"] {
+  color: var(--color-surface);
+  background-color: var(--color-text);
+}
+
+/* Focus ring for both buttons. It uses the site's --color-focus (not a
+   panel property), because the ring is drawn outside the button, over
+   the page as well as the panel. --color-focus is at least 3:1 against
+   both --color-bg and --color-surface in both themes. The 2px offset
+   leaves a gap so the ring stays visible next to the button's border
+   and the filled state. */
+#compact-toggle:focus,
+fact-panel button:focus {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* No-JavaScript fallback (projects.html). The <noscript> sits right
+   after <fact-panel>, so the + (next sibling) combinator finds it. Its
+   content only shows when JavaScript is off, so this rule never applies
+   otherwise. It's boxed like the panel so the message sits where the
+   widget would be. Site variables, not --fact-panel-* ones, because the
+   message is outside <fact-panel>. */
+fact-panel + noscript p {
+  margin-block: 1rem;
+  padding: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+}
+
+/* About page (about.html). Wider main so the story text column next to
+   the photo still gets ~70 characters per line. */
+.about-page main {
+  --photo: 12rem;
+  --badge: 4rem;
+  --story-gap: 2.5rem;
+  max-width: calc(var(--photo) + var(--story-gap) + 70ch + 2 * var(--space));
+}
+
+/* Even spacing: sections 2.5rem apart, each heading 1rem from its content */
+.about-page main > section + section {
+  margin-top: 2.5rem;
+}
+
+.about-page main h2 {
+  margin: 0 0 1rem;
+}
+
+.about-page main > section > p:last-child {
+  margin-bottom: 0;
+}
+
+/* My story: photo above text on narrow screens, photo left / text right
+   on wide screens */
+.about-page section[aria-labelledby="story-heading"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 1rem;
+}
+
+.about-page #story-heading {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.about-page section[aria-labelledby="story-heading"] picture,
+.about-page section[aria-labelledby="story-heading"] svg {
+  grid-row: 2;
+  grid-column: 1;
+  justify-self: center;
+  align-self: start;
+}
+
+.about-page section[aria-labelledby="story-heading"] picture {
+  display: block;
+  width: var(--photo);
+  margin-bottom: calc(var(--badge) / 4); /* room for the badge overhang */
+}
+
+.about-page section[aria-labelledby="story-heading"] img {
+  display: block;
+  width: 100%;
+}
+
+/* JV badge sits over the photo's bottom-right corner, hanging a quarter
+   of its size past the edges */
+.about-page section[aria-labelledby="story-heading"] svg {
+  width: var(--badge);
+  height: var(--badge);
+  transform: translate(
+    calc(var(--photo) / 2 - var(--badge) / 4),
+    calc(var(--photo) - var(--badge) * 3 / 4)
+  );
+}
+
+.about-page section[aria-labelledby="story-heading"] svg circle {
+  fill: var(--color-surface);
+  stroke: var(--color-text);
+}
+
+.about-page section[aria-labelledby="story-heading"] svg text {
+  fill: var(--color-text);
+  font-family: var(--font-main);
+}
+
+.about-page section[aria-labelledby="story-heading"] p {
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .about-page section[aria-labelledby="story-heading"] {
+    grid-template-columns: var(--photo) minmax(0, 70ch);
+    /* heading, three paragraphs, then a flexible row that absorbs the
+       photo's extra height so the paragraphs stay evenly spaced */
+    grid-template-rows: auto auto auto auto 1fr;
+    column-gap: var(--story-gap);
+  }
+
+  .about-page section[aria-labelledby="story-heading"] picture,
+  .about-page section[aria-labelledby="story-heading"] svg {
+    grid-row: 2 / -1;
+  }
+
+  .about-page section[aria-labelledby="story-heading"] p {
+    grid-column: 2;
+  }
+}
+
+/* Involvement boxes: side by side when there's room, stacked otherwise */
+.about-page section[aria-labelledby="involvement-heading"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.about-page #involvement-heading {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.about-page article {
+  flex: 1 1 16rem;
+  margin: 0;
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+}
+
+.about-page article h3 {
+  margin-bottom: 0.5rem;
+}
+
+.about-page article > :last-child {
+  margin-bottom: 0;
+}
+
+.about-page section[aria-labelledby="outside-heading"] p {
+  max-width: 70ch;
+}
+
+/* Contact page (form-no-js.html). Everything is scoped to .contact-page
+   so no other page changes. */
+.contact-page main > p,
+.contact-page address {
+  text-align: center;
+}
+
+.contact-page address {
+  font-style: normal;
+}
+
+/* "Find me online" links as one centered row, no bullets */
+.contact-page section[aria-labelledby="links-heading"] ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.contact-page section[aria-labelledby="links-heading"] a {
+  overflow-wrap: anywhere;
+}
+
+/* Form sits on the page background as a centered ~30rem column */
+.contact-page .contact-form {
+  width: 100%;
+  max-width: 30rem;
+  margin: 1rem auto 0;
+  text-align: left;
+}
+
+.contact-page .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.contact-page .field label {
+  font-weight: normal;
+}
+
+/* Border stays 1px in every state so later validation styles
+   cannot cause layout shift. */
+.contact-page .field input,
+.contact-page .field textarea,
+.contact-page .contact-form button {
+  font: inherit;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-text);
+  border-radius: 2px;
+  padding: 0.5rem 0.75rem;
+}
+
+.contact-page .field input,
+.contact-page .field textarea {
+  width: 100%;
+}
+
+.contact-page .field textarea {
+  resize: vertical;
+}
+
+.contact-page .contact-form button {
+  cursor: pointer;
+}
+
+.contact-page .contact-form button:hover {
+  background-color: var(--color-text);
+  color: var(--color-surface);
+}
+
+.contact-page main a:focus,
+.contact-page .contact-form input:focus,
+.contact-page .contact-form textarea:focus,
+.contact-page .contact-form button:focus {
+  outline: 3px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+.contact-page .field .hint {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+/* Validation states. :user-invalid / :user-valid only match after the
+   user interacts, so empty fields are not flagged on page load. Only
+   colors and an inset shadow change, never border width, padding or
+   margins, so nothing shifts. The inset bar marks errors without
+   relying on color alone. */
+.contact-page .field input:user-invalid,
+.contact-page .field textarea:user-invalid {
+  border-color: var(--color-error);
+  background-color: var(--color-error-bg);
+  box-shadow: inset 4px 0 0 var(--color-error);
+}
+
+.contact-page .field input:user-valid,
+.contact-page .field textarea:user-valid {
+  border-color: var(--color-valid);
+}
+
+/* Part 3 message areas (form-with-js.html). Both start with the hidden
+   attribute and form.js removes it, so they never show without JS.
+   No display is set on #error-area or #comments-info, so the hidden
+   attribute keeps working. No transitions or animations, so nothing
+   flashes. */
+.contact-page #comments-info {
+  margin: 0 0 1rem;
+  padding-left: 0.5rem;
+  /* Transparent bar in the normal state so the warning state only
+     changes colors and the text never moves. */
+  border-left: 4px solid transparent;
+  font-size: 0.9em;
+}
+
+.contact-page #comments-info.is-warning {
+  color: var(--color-warning);
+  border-left-color: var(--color-warning);
+}
+
+.contact-page #error-area {
+  margin-top: 1rem;
+}
+
+/* Error paragraphs: a red left bar and bold text, so errors are not
+   shown by color alone. Each message also names its field. */
+.contact-page #error-area p {
+  margin: 0 0 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 4px solid var(--color-error);
+  color: var(--color-error);
+  font-weight: bold;
+}
+
+/* Empty error paragraphs take up no space */
+.contact-page #error-area p:empty {
+  display: none;
+}

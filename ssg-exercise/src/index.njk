@@ -1,0 +1,51 @@
+---
+# Front matter: settings for this page, between the two --- lines.
+# It's YAML. Values are quoted because some contain ":" or "|".
+layout: layout.njk        # wrap this page in _includes/layout.njk
+title: "James Villanueva | Software Engineer"
+description: "Portfolio of James Villanueva, computer science student at UC San Diego building full-stack web apps."
+bodyClass: "block-cards"  # same <body> class as the portfolio's index.html
+permalink: "index.html"   # write the output to _site/index.html
+#
+# Below the front matter: the <main> content of the portfolio's
+# index.html. Left out: the <hello-world> element and its <noscript>
+# message, because they only make sense with the inline script, and
+# this exercise has no JavaScript.
+---
+    <section aria-labelledby="intro-heading">
+      <h1 id="intro-heading">James Villanueva</h1>
+      <picture>
+        <source srcset="images/headshot.webp" type="image/webp">
+        <img src="images/headshot.jpg" alt="Headshot of James Villanueva">
+      </picture>
+      <p>I'm a <strong>computer science student at UC San Diego</strong> (Class of 2028) who builds full-stack web apps and research tools. I'm especially interested in <em>observability</em> and AI-adjacent engineering.</p>
+      <div>
+        <a href="resume.pdf">View my resume</a>
+        <a href="form-no-js.html">Contact me</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="featured-heading">
+      <h2 id="featured-heading">Featured projects</h2>
+      <project-card>
+        <h3>WatchTower</h3>
+        <p>Real-time, authenticated dashboards. Stack: <span translate="no">Node.js</span>, <span translate="no">Supabase</span>.</p>
+        <a href="projects/watchtower.html">Read the WatchTower case study</a>
+      </project-card>
+      <project-card>
+        <h3>Waypoint</h3>
+        <p>A campus directory for UC San Diego student organizations and events.</p>
+        <a href="projects.html">See all projects</a>
+      </project-card>
+      <project-card>
+        <h3>My Dashboard</h3>
+        <p>A personal dashboard. Stack: <span translate="no">React</span>, <span translate="no">TypeScript</span>, <span translate="no">Vite</span>, <span translate="no">Clerk</span>.</p>
+        <a href="projects.html">See all projects</a>
+      </project-card>
+    </section>
+
+    <section aria-labelledby="about-teaser-heading">
+      <h2 id="about-teaser-heading">About me</h2>
+      <p>I'm a first-generation college student, an undergraduate researcher, and a member of ColorStack and SHPE at UC San Diego.</p>
+      <p><a href="about.html">Read my story</a></p>
+    </section>

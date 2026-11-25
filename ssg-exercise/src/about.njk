@@ -1,0 +1,45 @@
+---
+# Front matter: settings for this page, between the two --- lines.
+# It's YAML. Values are quoted because some contain ":" or "|".
+layout: layout.njk        # wrap this page in _includes/layout.njk
+title: "About | James Villanueva"
+description: "James Villanueva's story: a first-generation CS student at UC San Diego."
+bodyClass: "about-page"   # same <body> class as the portfolio's about.html
+permalink: "about.html"   # write the output to _site/about.html
+#
+# Below the front matter: the <main> content of the portfolio's
+# about.html, unchanged.
+---
+    <h1>About me</h1>
+
+    <section aria-labelledby="story-heading">
+      <h2 id="story-heading">My story</h2>
+      <picture>
+        <source srcset="images/headshot.webp" type="image/webp">
+        <img src="images/headshot.jpg" alt="Headshot of James Villanueva" width="400" height="400">
+      </picture>
+      <svg width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="JV monogram">
+        <circle cx="48" cy="48" r="44" fill="none" stroke="black" stroke-width="3"/>
+        <text x="48" y="58" text-anchor="middle" font-size="30" font-family="sans-serif" fill="black">JV</text>
+      </svg>
+      <p>I'm the <strong>first person in my family to go to college</strong>, and I'm studying computer science at UC San Diego.</p>
+      <p>I got into coding in 6th grade, when I started making an app in Xcode. From there, I learned JavaScript and got into more creative coding.</p>
+      <p>I'm not sure yet what I want to build next, but I know I want it to be meaningful and to contribute to a large project.</p>
+    </section>
+
+    <section aria-labelledby="involvement-heading">
+      <h2 id="involvement-heading">Involvement</h2>
+      <article>
+        <h3>ColorStack</h3>
+        <p>A community for Black and Latinx computing students. <b>Role:</b> member.</p>
+      </article>
+      <article>
+        <h3>SHPE</h3>
+        <p>The Society of Hispanic Professional Engineers chapter at UC San Diego. <b>Role:</b> member.</p>
+      </article>
+    </section>
+
+    <section aria-labelledby="outside-heading">
+      <h2 id="outside-heading">Outside of code</h2>
+      <p>Outside of code, my favorite thing to do is play <i>Super Smash Bros. Ultimate</i>. I also like exploring technology in general.</p>
+    </section>
